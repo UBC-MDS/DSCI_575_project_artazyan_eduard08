@@ -13,6 +13,7 @@ dependencies:
   - ipykernel
 
   - pip:
+      - "datasets<4.0"
       - rank-bm25
       - sentence-transformers
       - faiss-cpu
