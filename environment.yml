@@ -1,0 +1,25 @@
+name: dsci575_project
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.11
+  - pip
+  - pandas
+  - numpy
+  - scikit-learn
+  - jupyterlab
+  - ipykernel
+
+  - pip:
+      - rank-bm25
+      - sentence-transformers
+      - faiss-cpu
+      - transformers
+      - huggingface_hub
+      - langchain
+      - streamlit
+      - python-dotenv
+      - duckduckgo-search
+      - ragas
