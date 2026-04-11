@@ -1,28 +1,11 @@
-
-import re
 import pickle
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from src.utils import tokenize
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROCESSED_DIR = BASE_DIR / "data" / "processed"
-
-def tokenize(text):
-    """
-    Tokenize input text by lowercasing, removing punctuation,
-    and splitting on whitespace.
-
-    Args:
-        text (str): Input text document
-
-    Returns:
-        list[str]: List of tokens
-    """
-
-    text = text.lower()
-    text = re.sub(r"[^\w\s]", " ", text)
-    return text.split()
 
 
 def load_bm25():
