@@ -23,8 +23,11 @@ def resources():
     return {"df": df, "bm25": bm25, "semantic_model": model, "semantic_index": index, "meta": meta}
 
 
-st.set_page_config(page_title="Book review search", layout="wide")
-st.title("Query book reviews")
+APP_TITLE = "Information Retrieval with BM25 and Embeddings"
+
+st.set_page_config(page_title=APP_TITLE, layout="wide")
+st.title(APP_TITLE)
+st.caption("Query the merged book-review corpus; compare sparse (BM25) vs dense (embedding + FAISS) retrieval.")
 
 data = resources()
 
