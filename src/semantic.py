@@ -18,3 +18,28 @@ def load_semantic():
     index = faiss.read_index(str(PROCESSED_DIR / "semantic_faiss.index"))
     return model, index, meta
 
+def semantic_search(query, model, index, df, top_k=5):
+    if not query or not str(query).strip():
+        raise ValueError("Query can not be empty")
+
+    q = model.encode(
+        [str(query)],
+        convert_to_numpy=True,
+        normalize_embeddings=True,
+    ).astype(np.float32)
+
+    scores, idx = index.search(q, top_k)
+    scores, idx = scores[0], idx[0]
+
+    results = df.iloc[idx].copy()
+    results["semantic_score"] = scores
+
+    return results[
+        [
+            "product_title",
+            "review_title",
+            "review_text",
+            "semantic_score",
+            "rating",
+        ]
+    ]
