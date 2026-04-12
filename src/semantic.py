@@ -43,3 +43,4 @@ def semantic_search(query, model, index, df, top_k=5):
             "rating",
         ]
     ]
+
