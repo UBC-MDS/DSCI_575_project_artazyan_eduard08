@@ -61,6 +61,16 @@ streamlit run app/app.py
 Then open:
 http://localhost:8501
 
+### Screenshots
+
+**BM25 retrieval**
+
+![Streamlit app — BM25 query and results](img/bm25_querry.png)
+
+**Semantic retrieval**
+
+![Streamlit app — semantic query and results](img/semantic_querry.png)
+
 ---
 
 ## Workflow
