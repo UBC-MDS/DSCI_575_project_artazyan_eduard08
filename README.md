@@ -71,6 +71,10 @@ http://localhost:8501
 
 ![Streamlit app — semantic query and results](img/semantic_querry.png)
 
+**App main query UI**
+
+![Streamlit app — main query UI](img/app_mq.png)
+
 ---
 
 ## Workflow
