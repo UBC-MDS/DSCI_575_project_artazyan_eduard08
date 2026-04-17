@@ -20,6 +20,7 @@ dependencies:
       - transformers
       - huggingface_hub
       - langchain
+      - langchain-community
       - langchain-huggingface
       - streamlit
       - python-dotenv
