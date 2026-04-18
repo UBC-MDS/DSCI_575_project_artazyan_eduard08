@@ -2,12 +2,12 @@
 
 ## Project Overview
 
-This project builds a search system over Amazon Kindle Store data using two approaches:
+This project builds a search and **RAG** system over Amazon Kindle Store reviews and metadata:
 
-- BM25 (keyword-based retrieval)
-- Semantic search (dense embeddings + FAISS)
+- **Milestone 1:** BM25 (sparse) vs semantic search (dense embeddings + FAISS), compared in the notebook and the **Search** tab of the app.
+- **Milestone 2:** **Semantic RAG** and **hybrid RAG** (`src/hybrid.py`: BM25 + semantic fused with RRF), both using the same context builder, prompts, and hosted **Meta-Llama-3-8B-Instruct** (`src/rag_pipeline.py`, **RAG** tab in the app, `notebooks/milestone2_rag.ipynb`).
 
-The goal is to compare both methods in terms of relevance and performance across different query types.
+Qualitative write-up for Milestone 2 (prompts, hybrid design, manual eval) is in `results/milestone2_discussion.md`.
 
 ---
 
@@ -69,6 +69,11 @@ jupyter lab
 2. Open and run:
 ```bash
 notebooks/milestone1_exploration.ipynb
+```
+
+3. Milestone 2 RAG / hybrid exploration:
+```bash
+notebooks/milestone2_rag.ipynb
 ```
 
 ---
@@ -135,30 +140,37 @@ The RAG tab showcases the enhanced retrieval-augmented generation pipeline, whic
 
 Code lives in `src/rag_pipeline.py`:
 
-- **`semantic_rag_pipeline`** — FAISS semantic retrieval, then shared context → prompt → LLM.
-- **`hybrid_rag_pipeline`** — `hybrid_retriever` in `src/hybrid.py` (BM25 + semantic + RRF), then the **same** context → prompt → LLM path as semantic RAG.
+- **`semantic_rag_pipeline`** — FAISS semantic retrieval only, then shared **context → prompt (V2) → LLM**.
+- **`hybrid_rag_pipeline`** — **`hybrid_retriever`** in `src/hybrid.py` (BM25 + FAISS rankings fused with **RRF**), then the **same** context → prompt → LLM path.
 
-Given a query, retrieval returns top‑k rows; those rows are formatted with `build_context`, wrapped with `build_prompt`, and sent to the hosted LLaMA model.
+Both pipelines use `build_context` / `build_prompt` and the hosted **Meta-Llama-3-8B-Instruct** endpoint.
 
-<!--
-RAG Pipeline Workflow Diagram:
+### Semantic RAG (Step 2)
 
-User Query 
-   ↓
-Semantic Retriever (FAISS)
-   ↓
-Top-K Relevant Documents
-   ↓
-Build Context
-   ↓
-Prompt Template (V2)
-   ↓
-LLM (Meta LLaMA)
-   ↓
-Final Answer + Sources
--->
+```mermaid
+flowchart LR
+    Q[User query] --> R[Semantic retriever FAISS]
+    R --> K[Top-k rows]
+    K --> C[build_context]
+    C --> P[Prompt template V2]
+    P --> L[LLM Meta-Llama-3-8B-Instruct]
+    L --> A[Answer + retrieved docs]
+```
 
-User Query → Semantic Retriever (FAISS) → Top-K Relevant Documents → Build Context → Prompt Template (V2) → LLM (Meta LLaMA) → Final Answer + Sources
+### Hybrid RAG (Step 3–3.4)
+
+```mermaid
+flowchart LR
+    Q[User query] --> B[BM25 ranked row IDs]
+    Q --> S[FAISS semantic ranked row IDs]
+    B --> F[RRF fusion]
+    S --> F
+    F --> K[Top-k merged rows]
+    K --> C[build_context]
+    C --> P[Prompt template V2]
+    P --> L[LLM Meta-Llama-3-8B-Instruct]
+    L --> A[Answer + retrieved docs]
+```
 
 ---
 
@@ -169,7 +181,7 @@ Results and analysis comparing BM25 and semantic search can be found in:
 
 results/milestone1_discussion.md
 
-### Milestone 2: RAG Evaluation
-Results and qualitative evaluation of the RAG and hybrid RAG systems can be found in:
+### Milestone 2: RAG evaluation
+Qualitative evaluation covers **semantic-only** and **hybrid** RAG (prompt variants V1–V3, top‑k notes, five manual queries, limitations, improvements):
 
 results/milestone2_discussion.md
