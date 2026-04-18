@@ -88,10 +88,34 @@ http://localhost:8501
 
 ---
 
+## RAG Pipeline Workflow
+
+We implemented a semantic RAG pipeline that follows four steps: retrieval, context construction, prompt generation, and response generation.
+
+Given a user query, we first retrieve the top-k most relevant documents using an updated Milestone 1 semantic retriever function. Then, these documents are combined into a structured context. The context and query are passed into a prompt template, which is sent to the language model to generate a final answer.
+
+This design allows us to easily test different prompts and ensures that the model’s responses are accurate.
+
+```mermaid
+flowchart LR
+    A[User Query] --> B[Semantic Retriever (FAISS)]
+    B --> C[Top-K Relevant Documents]
+    C --> D[Build Context]
+    D --> E[Prompt Template (V2)]
+    E --> F[LLM (Meta LLaMA)]
+    F --> G[Final Answer + Sources]
+```
+
+---
+
 ## Results
 
+### Milestone 1: Retrieval Evaluation
 Results and analysis comparing BM25 and semantic search can be found in:
 
-```
 results/milestone1_discussion.md
-```
+
+### Milestone 2: RAG Evaluation
+Results and qualitative evaluation of the RAG and hybrid RAG systems can be found in:
+
+results/milestone2_discussion.md
