@@ -11,30 +11,51 @@ The goal is to compare both methods in terms of relevance and performance across
 
 ---
 
-## Milestone 1: Environment
+## Environment setup
 
-From the repo root:
+From the project root:
 
 ```bash
 conda env create -f environment.yml
 conda activate dsci575_project
+```
+
+Run notebooks:
+
+```bash
 jupyter lab
 ```
 
-## Milestone 2: Rag Environment Setup
+Run the app:
 
-This project requires a Hugging Face API token.
+```bash
+streamlit run app/app.py
+```
 
-You can set it in a `.env` file at the root of the project:
+## Milestone 2: Hugging Face token setup
 
-HUGGINGFACEHUB_API_TOKEN=your_token_here
+This project requires a Hugging Face token for hosted LLM inference.
 
-Alternatively, you can export it directly in your terminal:
+Create a token:
 
-export HUGGINGFACEHUB_API_TOKEN=your_token_here
+1. Go to https://huggingface.co/settings/tokens
+2. Sign in
+3. Click **New token**
+4. Give it a name (for example: `dsci575-rag`)
+5. Choose scope: **Read** (usually enough for inference endpoints)
+6. Create and copy the token (it starts with `hf_...`)
 
-You can generate a token at:
-https://huggingface.co/settings/tokens
+Add token to `.env` at the project root:
+
+```env
+HUGGINGFACEHUB_API_TOKEN=hf_your_token_here
+```
+
+Or export it in your terminal:
+
+```bash
+export HUGGINGFACEHUB_API_TOKEN=hf_your_token_here
+```
 
 ---
 
@@ -86,11 +107,17 @@ http://localhost:8501
 
 ![Streamlit app — semantic query and results](img/semantic_querry.png)
 
-**Semantic retrieval**
+**Milestone 2: RAG Improvements and Implementation**
+
+The RAG tab showcases the enhanced retrieval-augmented generation pipeline, which combines semantic or hybrid retrieval with LLM-powered answers. Numbered sources and the raw context are provided to ensure transparency and traceability.
+
+**Hybrid (BM25 + Semantic + RRF) Retrieval + LLM**
 
 ![Streamlit RAG app](img/rag_app.png)
 
+**Semantic-Only RAG Retrieval + LLM**
 
+![Streamlit RAG app](img/rag_working_app.png)
 ---
 
 ## Workflow
