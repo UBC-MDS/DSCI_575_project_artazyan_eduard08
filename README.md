@@ -54,10 +54,10 @@ notebooks/milestone1_exploration.ipynb
 
 ## Streamlit App (Query Dashboard)
 
-Interactive search over the dataset using:
+Two tabs:
 
-- BM25 → keyword matching  
-- Semantic search → embeddings + FAISS  
+- **Search** — BM25 vs semantic retrieval (Milestone 1), results table only.  
+- **RAG** — semantic or hybrid retrieval + LLM answer, numbered sources, and raw context in an expander. Requires **`HUGGINGFACEHUB_API_TOKEN`** (see Milestone 2 env setup above).
 
 ### Prerequisites (in data/processed/)
 
@@ -100,13 +100,14 @@ http://localhost:8501
 
 ---
 
-## RAG Pipeline Workflow
+## RAG pipeline workflow
 
-We implemented a semantic RAG pipeline that follows four steps: retrieval, context construction, prompt generation, and response generation.
+Code lives in `src/rag_pipeline.py`:
 
-Given a user query, we first retrieve the top-k most relevant documents using an updated Milestone 1 semantic retriever function. Then, these documents are combined into a structured context. The context and query are passed into a prompt template, which is sent to the language model to generate a final answer.
+- **`semantic_rag_pipeline`** — FAISS semantic retrieval, then shared context → prompt → LLM.
+- **`hybrid_rag_pipeline`** — `hybrid_retriever` in `src/hybrid.py` (BM25 + semantic + RRF), then the **same** context → prompt → LLM path as semantic RAG.
 
-This design allows us to easily test different prompts and ensures that the model’s responses are accurate.
+Given a query, retrieval returns top‑k rows; those rows are formatted with `build_context`, wrapped with `build_prompt`, and sent to the hosted LLaMA model.
 
 <!--
 RAG Pipeline Workflow Diagram:

@@ -1,5 +1,13 @@
+"""
+RAG pipelines: semantic-only and hybrid (BM25 + dense + RRF).
+
+Both paths share ``build_context`` → ``build_prompt`` → ``llm.invoke``; only the
+retriever differs (``semantic_retriever_rag`` vs ``hybrid_retriever``).
+"""
+
 from src.hybrid import hybrid_retriever
 from src.semantic import semantic_retriever_rag
+
 
 def build_context(docs_df):
 
@@ -61,39 +69,26 @@ def build_prompt(query, context, system_prompt = None):
     return prompt
 
 
-
-
-def semantic_rag_pipeline(query, llm, model, index, df, top_k=5):
-
-    docs = semantic_retriever_rag(query, model, index, df, top_k)
-
-    context = build_context(docs)
-
+def _rag_answer(query, llm, docs_df):
+    """Shared context → prompt → LLM step for semantic and hybrid pipelines."""
+    context = build_context(docs_df)
     prompt = build_prompt(query, context)
-
     response = llm.invoke(prompt)
-
     return {
         "answer": response.content,
-        "docs": docs,
-        "context": context,
-        "prompt": prompt
-    }
-
-
-def hybrid_rag_pipeline(query, llm, bm25, model, index, df, top_k=5):
-
-    docs = hybrid_retriever(query, bm25, model, index, df, top_k=top_k)
-
-    context = build_context(docs)
-
-    prompt = build_prompt(query, context)
-
-    response = llm.invoke(prompt)
-
-    return {
-        "answer": response.content,
-        "docs": docs,
+        "docs": docs_df,
         "context": context,
         "prompt": prompt,
     }
+
+
+def semantic_rag_pipeline(query, llm, model, index, df, top_k=5):
+    """RAG with FAISS semantic retrieval only (Milestone 2 Step 2)."""
+    docs = semantic_retriever_rag(query, model, index, df, top_k)
+    return _rag_answer(query, llm, docs)
+
+
+def hybrid_rag_pipeline(query, llm, bm25, model, index, df, top_k=5):
+    """RAG with ``hybrid_retriever`` (BM25 + semantic + RRF) (Milestone 2 Step 3–3.4)."""
+    docs = hybrid_retriever(query, bm25, model, index, df, top_k=top_k)
+    return _rag_answer(query, llm, docs)
