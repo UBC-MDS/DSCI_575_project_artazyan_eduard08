@@ -11,7 +11,7 @@ The goal is to compare both methods in terms of relevance and performance across
 
 ---
 
-## Environment
+## Milestone 1: Environment
 
 From the repo root:
 
@@ -20,6 +20,21 @@ conda env create -f environment.yml
 conda activate dsci575_project
 jupyter lab
 ```
+
+## Milestone 2: Rag Environment Setup
+
+This project requires a Hugging Face API token.
+
+You can set it in a `.env` file at the root of the project:
+
+HUGGINGFACEHUB_API_TOKEN=your_token_here
+
+Alternatively, you can export it directly in your terminal:
+
+export HUGGINGFACEHUB_API_TOKEN=your_token_here
+
+You can generate a token at:
+https://huggingface.co/settings/tokens
 
 ---
 
