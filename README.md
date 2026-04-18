@@ -86,9 +86,6 @@ http://localhost:8501
 
 ![Streamlit app — semantic query and results](img/semantic_querry.png)
 
-**App main query UI**
-
-![Streamlit app — main query UI](img/app_mq.png)
 
 ---
 
@@ -111,15 +108,25 @@ Given a user query, we first retrieve the top-k most relevant documents using an
 
 This design allows us to easily test different prompts and ensures that the model’s responses are accurate.
 
-```mermaid
-flowchart LR
-    A[User Query] --> B[Semantic Retriever (FAISS)]
-    B --> C[Top-K Relevant Documents]
-    C --> D[Build Context]
-    D --> E[Prompt Template (V2)]
-    E --> F[LLM (Meta LLaMA)]
-    F --> G[Final Answer + Sources]
-```
+<!--
+RAG Pipeline Workflow Diagram:
+
+User Query 
+   ↓
+Semantic Retriever (FAISS)
+   ↓
+Top-K Relevant Documents
+   ↓
+Build Context
+   ↓
+Prompt Template (V2)
+   ↓
+LLM (Meta LLaMA)
+   ↓
+Final Answer + Sources
+-->
+
+User Query → Semantic Retriever (FAISS) → Top-K Relevant Documents → Build Context → Prompt Template (V2) → LLM (Meta LLaMA) → Final Answer + Sources
 
 ---
 
