@@ -86,6 +86,10 @@ http://localhost:8501
 
 ![Streamlit app — semantic query and results](img/semantic_querry.png)
 
+**Semantic retrieval**
+
+![Streamlit RAG app](img/rag_app.png)
+
 
 ---
 
