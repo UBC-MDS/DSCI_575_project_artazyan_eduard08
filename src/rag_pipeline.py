@@ -1,3 +1,4 @@
+from src.hybrid import hybrid_retriever
 from src.semantic import semantic_retriever_rag
 
 def build_context(docs_df):
@@ -77,4 +78,22 @@ def semantic_rag_pipeline(query, llm, model, index, df, top_k=5):
         "docs": docs,
         "context": context,
         "prompt": prompt
+    }
+
+
+def hybrid_rag_pipeline(query, llm, bm25, model, index, df, top_k=5):
+
+    docs = hybrid_retriever(query, bm25, model, index, df, top_k=top_k)
+
+    context = build_context(docs)
+
+    prompt = build_prompt(query, context)
+
+    response = llm.invoke(prompt)
+
+    return {
+        "answer": response.content,
+        "docs": docs,
+        "context": context,
+        "prompt": prompt,
     }
