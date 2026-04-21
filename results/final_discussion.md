@@ -1,3 +1,7 @@
+# Final Discussion
+
+## Step 1: Improve Your Workflow
+
 ### Dataset Scaling
 
 We scaled our dataset by combinining approximately 275,000 records from the reviews dataset and 50,000 records from the product metadata dataset. These datasets were merged using an inner join on the product identifier (parent_asin).
@@ -48,3 +52,15 @@ Since Qwen showed less consistency, andkept drifting from the user’s intent or
 #### Model Selection
 
 Based on these results, we selected Meta-Llama-3-8B-Instruct. It demonstrated stronger grounding, better adherence to instructions, and more reliable performance for RAG-based question answering tasks.
+
+## Step 2: Additional Feature (state which option you chose)
+
+## Step 3: Improve Documentation and Code Quality
+
+- Updated the README to include the final milestone additions, including the LLM comparison and final model selection
+- Improved clarity of setup and usage instructions for running the project
+- Added docstrings to all custom functions to improve readability and clarity
+- Verified that no hardcoded file paths are used (all paths are relative)
+- Confirmed that no API keys are stored in the source code (using `.env`)
+
+## Step 4: Cloud Deployment Plan
