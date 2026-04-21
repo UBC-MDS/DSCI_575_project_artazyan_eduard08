@@ -185,3 +185,27 @@ results/milestone1_discussion.md
 Qualitative evaluation covers **semantic-only** and **hybrid** RAG (prompt variants V1–V3, top‑k notes, five manual queries, limitations, improvements):
 
 results/milestone2_discussion.md
+
+---
+
+## Milestone 3: LLM Comparison and Final Model
+
+We evaluated two LLMs within the same RAG pipeline:
+
+- Meta-Llama-3-8B-Instruct
+- Qwen3-8B
+
+Both models were tested using the same retrieved context and prompt across 5 queries.
+
+### Key Findings
+
+- Llama produced more concise, coherent and instruction-aligned responses
+- It consistently used only the provided context
+- It clearly handled cases with insufficient information
+
+- Qwen generated more verbose outputs and often included intermediate reasoning (e.g., <think> tokens)
+- This resulted in less direct and sometimes less relevant answers
+
+### Final Model Choice
+
+Based on these results, we selected **Meta-Llama-3-8B-Instruct** as the final model due to its better grounding, consistency, and adherence to instructions.
