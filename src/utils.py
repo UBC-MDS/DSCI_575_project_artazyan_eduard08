@@ -27,3 +27,8 @@ def tokenize_corpus(corpus):
         tokenized_corpus.append(tokens)
 
     return tokenized_corpus
+
+def clean_output(text):
+    if "<think>" in text:
+        text = text.split("</think>")[-1]
+    return text.strip()
