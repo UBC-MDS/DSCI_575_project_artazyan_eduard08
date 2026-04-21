@@ -186,8 +186,6 @@ Qualitative evaluation covers **semantic-only** and **hybrid** RAG (prompt varia
 
 results/milestone2_discussion.md
 
----
-
 ## Milestone 3: LLM Comparison and Final Model
 
 We evaluated two LLMs within the same RAG pipeline:
