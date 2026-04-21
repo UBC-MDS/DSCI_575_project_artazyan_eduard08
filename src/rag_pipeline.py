@@ -10,6 +10,7 @@ from src.semantic import semantic_retriever_rag
 
 
 def build_context(docs_df):
+    """Build a formatted context string from retrieved documents."""
 
     context_parts = []
 
@@ -54,6 +55,7 @@ SYSTEM_PROMPT_V3 = (
 SYSTEM_PROMPT = SYSTEM_PROMPT_V2
 
 def build_prompt(query, context, system_prompt = None):
+    """Construct the prompt for the LLM using query and retrieved context."""
 
     if system_prompt is None:
         system_prompt = SYSTEM_PROMPT

@@ -18,6 +18,7 @@ def tokenize(text):
     return text.split()
 
 def tokenize_corpus(corpus):
+    """Tokenize a list of documents into lists of tokens."""
 
     tokenized_corpus = []
 
@@ -29,6 +30,7 @@ def tokenize_corpus(corpus):
     return tokenized_corpus
 
 def clean_output(text):
+    """Remove unwanted reasoning tags (e.g., <think>) from model output."""
     if "<think>" in text:
         text = text.split("</think>")[-1]
     return text.strip()
