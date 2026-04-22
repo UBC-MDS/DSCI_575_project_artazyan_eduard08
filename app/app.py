@@ -85,23 +85,24 @@ def resources():
 @st.cache_resource
 def _build_rag_llm(token: str):
     """
-    Build hosted LLM (text-generation inference API, not the chat router).
+    Hosted Meta-Llama-3-8B-Instruct via Hugging Face Inference / router.
 
-    Using the plain ``HuggingFaceEndpoint`` avoids ``router.huggingface.co/v1/chat/completions``,
-    which can return 401 if the token is not accepted for that route. ``huggingface_hub`` also
-    reads ``HUGGINGFACEHUB_API_TOKEN`` from the environment — we set that here.
+    This model (and e.g. provider **novita**) requires ``task="conversational"``, not
+    ``text-generation``. We wrap with ``ChatHuggingFace`` so the conversational API
+    and ``invoke``/message content match the rest of the stack.
     """
-    from langchain_huggingface import HuggingFaceEndpoint
+    from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 
     os.environ["HUGGINGFACEHUB_API_TOKEN"] = token
     os.environ["HF_TOKEN"] = token
 
-    return HuggingFaceEndpoint(
+    endpoint = HuggingFaceEndpoint(
         repo_id="meta-llama/Meta-Llama-3-8B-Instruct",
-        task="text-generation",
+        task="conversational",
         max_new_tokens=250,
         huggingfacehub_api_token=token,
     )
+    return ChatHuggingFace(llm=endpoint)
 
 
 def rag_llm():
