@@ -32,6 +32,39 @@ SUGGESTED_QUERIES = [
 
 ANSWER_PREVIEW_CHARS = 2800
 
+_HF_TOKEN_KEYS = (
+    "HUGGINGFACEHUB_API_TOKEN",
+    "HUGGING_FACE_HUB_TOKEN",
+    "HF_TOKEN",
+)
+
+
+def _get_huggingface_token() -> str | None:
+    """Resolve HF token: .env / env, then Streamlit Cloud secrets (not on os.environ by default for UI-only secrets in some setups)."""
+    from dotenv import load_dotenv
+
+    load_dotenv(ROOT / ".env")
+    load_dotenv()
+    for key in _HF_TOKEN_KEYS:
+        t = os.getenv(key)
+        if t and str(t).strip():
+            return str(t).strip()
+    try:
+        sec = st.secrets
+    except Exception:
+        return None
+    for key in _HF_TOKEN_KEYS:
+        if key in sec:
+            t = sec[key]
+            if t is not None and str(t).strip():
+                return str(t).strip()
+    if "huggingface" in sec and isinstance(sec["huggingface"], dict):
+        h = sec["huggingface"]
+        for key in ("HUGGINGFACEHUB_API_TOKEN", "token", "api_token"):
+            if key in h and h[key]:
+                return str(h[key]).strip()
+    return None
+
 
 @st.cache_resource
 def resources():
@@ -42,19 +75,10 @@ def resources():
 
 
 @st.cache_resource
-def rag_llm():
-    """Hosted LLM for RAG tab; requires HUGGINGFACEHUB_API_TOKEN in environment or .env."""
-    try:
-        from dotenv import load_dotenv
-        from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
-    except ImportError as e:
-        raise RuntimeError(f"Missing RAG dependencies: {e}") from e
+def _build_rag_llm(token: str):
+    """Build hosted LLM once per token. Do not call when token is missing — avoids caching None."""
+    from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 
-    load_dotenv(ROOT / ".env")
-    load_dotenv()
-    token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-    if not token:
-        return None
     endpoint = HuggingFaceEndpoint(
         repo_id="meta-llama/Meta-Llama-3-8B-Instruct",
         task="text-generation",
@@ -62,6 +86,19 @@ def rag_llm():
         huggingfacehub_api_token=token,
     )
     return ChatHuggingFace(llm=endpoint)
+
+
+def rag_llm():
+    """Hosted LLM for RAG: env, .env, or st.secrets (Streamlit Community Cloud)."""
+    try:
+        import langchain_huggingface  # noqa: F401
+    except ImportError as e:
+        raise RuntimeError(f"Missing RAG dependencies: {e}") from e
+
+    token = _get_huggingface_token()
+    if not token:
+        return None
+    return _build_rag_llm(token)
 
 
 def rating_stars(rating) -> str:
@@ -208,8 +245,11 @@ with tab_rag:
     llm = rag_llm()
     if llm is None:
         st.warning(
-            "Set **HUGGINGFACEHUB_API_TOKEN** in a `.env` file at the project root (or export it) "
-            "and restart the app. See README → Milestone 2."
+            "No Hugging Face token found. **Local:** set `HUGGINGFACEHUB_API_TOKEN` in a `.env` at the project root "
+            "or export it, then restart. **Streamlit Community Cloud:** add the same key in "
+            "**App settings → Secrets** as TOML (root level), e.g. `HUGGINGFACEHUB_API_TOKEN = \"hf_…\"` — "
+            "not only GitHub repo secrets. Wait ~1 minute and **Reboot app** if it still shows this. "
+            "See README (Milestone 2 / deployment)."
         )
 
     if st.button("Generate answer", type="primary", key="btn_rag", disabled=llm is None):
