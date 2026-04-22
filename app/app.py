@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from pandas.api.types import is_numeric_dtype
 
 # Ensure project root is on sys.path when Streamlit runs app/app.py
 ROOT = Path(__file__).resolve().parent.parent
@@ -70,6 +71,27 @@ def rating_stars(rating) -> str:
         return "—"
     n = max(0, min(5, n))
     return "★" * n + "☆" * (5 - n) + f" ({rating}/5)"
+
+
+def _search_result_column_config(df: pd.DataFrame) -> dict:
+    """Widen text columns and raise max_chars so long review snippets stay readable."""
+    cfg = {}
+    for col in df.columns:
+        if is_numeric_dtype(df[col]) and "score" in col.lower():
+            cl = col.lower()
+            fmt = (
+                "%.4f"
+                if "semantic" in cl or "bm25" in cl or "rrf" in cl
+                else "%.6f"
+            )
+            cfg[col] = st.column_config.NumberColumn(col, width="small", format=fmt)
+        elif is_numeric_dtype(df[col]):
+            cfg[col] = st.column_config.NumberColumn(col, width="small", format="%.2f")
+        else:
+            cfg[col] = st.column_config.TextColumn(
+                str(col), width="large", max_chars=20_000
+            )
+    return cfg
 
 
 def truncate_text(text, max_chars: int = 220) -> str:
@@ -161,7 +183,14 @@ with tab_search:
                         data["df"],
                         top_k=top_k,
                     )
-                st.dataframe(out, use_container_width=True)
+                h = min(800, 48 + 36 * (len(out) + 1))
+                st.dataframe(
+                    out,
+                    use_container_width=True,
+                    column_config=_search_result_column_config(out),
+                    height=h,
+                    hide_index=True,
+                )
             except Exception as e:
                 st.error(str(e))
 

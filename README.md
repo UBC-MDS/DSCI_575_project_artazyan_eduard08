@@ -25,6 +25,15 @@ This project builds a search and **RAG** system over Amazon Kindle Store reviews
 
 Follow these steps **in order** from the project root.
 
+### 0. Clone the repository and enter the project directory
+
+```bash
+git clone https://github.com/<YOUR_USERNAME>/DSCI_575_project_artazyan_eduard08.git
+cd DSCI_575_project_artazyan_eduard08
+```
+
+Use your fork or course group URL in place of `<YOUR_USERNAME>` if different.
+
 ### 1. Python environment (Conda)
 
 ```bash
@@ -48,6 +57,24 @@ The hosted LLM uses **Hugging Face Inference**; the token must be available as *
    Or in the shell: `export HUGGINGFACEHUB_API_TOKEN=hf_your_token_here`
 
 `python-dotenv` loads `.env` when you run the Streamlit app and many notebooks.
+
+### Data description and fields used
+
+**Source:** [Amazon Reviews 2023](https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/) (McAuley Lab, UCSD). This project uses the **Kindle Store** category: review and product **metadata** JSONL is downloaded (see `notebooks/milestone1_exploration.ipynb`), written to Parquet under `data/raw/`, then **inner-joined** on `parent_asin` so every row has both a review and product metadata.
+
+**`data/processed/merged.parquet`** (one row per review, joined to its product) includes:
+
+| Column | Role |
+|--------|------|
+| `parent_asin` | Product identifier (join key, also used in RAG citations) |
+| `rating` | Star rating for this review |
+| `review_title`, `review_text` | Review headline and body |
+| `verified_purchase` | Whether the review is from a verified purchase |
+| `product_title` | Product name from metadata |
+| `average_rating`, `main_category` | Aggregated product stats / category from metadata |
+| `description`, `features` | Product copy and bullet features (when present) |
+
+Downstream, a single searchable **`document`** string is built per row (product fields + review text) for **BM25** tokenization and **semantic** embeddings; indices (`bm25.pkl`, `semantic_faiss.index`) align **row index** with `merged.parquet`.
 
 ### 3. Processed data and indices (required to run the app and most notebooks)
 
@@ -76,7 +103,7 @@ If you are starting from the **raw** Amazon review/metadata inputs, run the proj
    ```
 
 2. In the Jupyter UI, open and run (top to bottom inside each notebook as needed):
-   - **`notebooks/milestone1_exploration.ipynb`** — BM25 vs semantic retrieval, EDA, index builds.
+   - **`notebooks/milestone1_exploration.ipynb`** — EDA, index builds, and a **side-by-side BM25 vs semantic** table for every evaluation query (run cells in order through `semantic_outputs`; paraphrase pair *book to relax before bed* / *best books for relaxing before sleep* illustrates lexical vs meaning).
    - **`notebooks/milestone2_rag.ipynb`** — Semantic and hybrid RAG, prompts, manual evaluation.
    - **`notebooks/final_llm_experiment.ipynb`** — Milestone 3 LLM comparison (Llama vs Qwen) on the same RAG context.
 
