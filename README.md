@@ -80,6 +80,8 @@ notebooks/milestone2_rag.ipynb
 
 ## Streamlit App (Query Dashboard)
 
+**Additional feature — deployed app:** the full query dashboard is hosted at [https://kindle-review-rag-engine.streamlit.app/](https://kindle-review-rag-engine.streamlit.app/).
+
 Two tabs:
 
 - **Search** — BM25 vs semantic retrieval (Milestone 1), results table only.  
