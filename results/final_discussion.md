@@ -55,6 +55,8 @@ Based on these results, we selected Meta-Llama-3-8B-Instruct. It demonstrated st
 
 ## Step 2: Additional Feature (state which option you chose)
 
+The additional feature is a **fully deployed** Streamlit version of the query dashboard, available at: **<https://kindle-review-rag-engine.streamlit.app/>**
+
 ## Step 3: Improve Documentation and Code Quality
 
 - Updated the README to include the final milestone additions, including the LLM comparison and final model selection
