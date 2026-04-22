@@ -39,6 +39,14 @@ _HF_TOKEN_KEYS = (
 )
 
 
+def _normalize_hf_token(raw: str) -> str:
+    """Strip whitespace and stray surrounding quotes (common in .env / TOML)."""
+    t = str(raw).strip()
+    if len(t) >= 2 and t[0] in "\"'" and t[-1] in "\"'":
+        t = t[1:-1].strip()
+    return t
+
+
 def _get_huggingface_token() -> str | None:
     """Resolve HF token: .env / env, then Streamlit Cloud secrets (not on os.environ by default for UI-only secrets in some setups)."""
     from dotenv import load_dotenv
@@ -48,7 +56,7 @@ def _get_huggingface_token() -> str | None:
     for key in _HF_TOKEN_KEYS:
         t = os.getenv(key)
         if t and str(t).strip():
-            return str(t).strip()
+            return _normalize_hf_token(t)
     try:
         sec = st.secrets
     except Exception:
@@ -57,12 +65,12 @@ def _get_huggingface_token() -> str | None:
         if key in sec:
             t = sec[key]
             if t is not None and str(t).strip():
-                return str(t).strip()
+                return _normalize_hf_token(str(t))
     if "huggingface" in sec and isinstance(sec["huggingface"], dict):
         h = sec["huggingface"]
         for key in ("HUGGINGFACEHUB_API_TOKEN", "token", "api_token"):
             if key in h and h[key]:
-                return str(h[key]).strip()
+                return _normalize_hf_token(str(h[key]))
     return None
 
 
@@ -76,16 +84,24 @@ def resources():
 
 @st.cache_resource
 def _build_rag_llm(token: str):
-    """Build hosted LLM once per token. Do not call when token is missing — avoids caching None."""
-    from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
+    """
+    Build hosted LLM (text-generation inference API, not the chat router).
 
-    endpoint = HuggingFaceEndpoint(
+    Using the plain ``HuggingFaceEndpoint`` avoids ``router.huggingface.co/v1/chat/completions``,
+    which can return 401 if the token is not accepted for that route. ``huggingface_hub`` also
+    reads ``HUGGINGFACEHUB_API_TOKEN`` from the environment — we set that here.
+    """
+    from langchain_huggingface import HuggingFaceEndpoint
+
+    os.environ["HUGGINGFACEHUB_API_TOKEN"] = token
+    os.environ["HF_TOKEN"] = token
+
+    return HuggingFaceEndpoint(
         repo_id="meta-llama/Meta-Llama-3-8B-Instruct",
         task="text-generation",
         max_new_tokens=250,
         huggingfacehub_api_token=token,
     )
-    return ChatHuggingFace(llm=endpoint)
 
 
 def rag_llm():
@@ -291,6 +307,12 @@ with tab_rag:
                     st.text(result.get("context", ""))
             except Exception as e:
                 st.error(str(e))
+                if "401" in str(e) or "Unauthorized" in str(e):
+                    st.caption(
+                        "**401** usually means the Hugging Face token is invalid, expired, or missing **Inference** "
+                        "permission (fine-grained tokens). Regenerate a token, update `.env` / Streamlit **Secrets** "
+                        "(no extra quotes), and accept the **Meta-Llama-3-8B-Instruct** model license on Hugging Face."
+                    )
 
 st.divider()
 st.markdown(

@@ -71,13 +71,26 @@ def build_prompt(query, context, system_prompt = None):
     return prompt
 
 
+def _llm_to_text(response) -> str:
+    """Normalize Base LLM (str) vs Chat (AIMessage with .content) output."""
+    if response is None:
+        return ""
+    if isinstance(response, str):
+        return response
+    if hasattr(response, "content") and response.content is not None:
+        return str(response.content)
+    if hasattr(response, "text") and response.text is not None:
+        return str(response.text)
+    return str(response)
+
+
 def _rag_answer(query, llm, docs_df):
     """Shared context → prompt → LLM step for semantic and hybrid pipelines."""
     context = build_context(docs_df)
     prompt = build_prompt(query, context)
     response = llm.invoke(prompt)
     return {
-        "answer": response.content,
+        "answer": _llm_to_text(response),
         "docs": docs_df,
         "context": context,
         "prompt": prompt,
