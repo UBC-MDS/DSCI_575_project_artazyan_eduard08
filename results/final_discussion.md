@@ -9,7 +9,7 @@
 
 ### LLM Experiment
 
-- **Models compared (name, family, size)**
+  **Models compared (name, family, size)**
   - **Meta-Llama-3-8B-Instruct** — Meta, Llama 3 family, **8B** parameters
   - **Qwen3-8B** — Alibaba, Qwen family, **8B** parameters  
 
